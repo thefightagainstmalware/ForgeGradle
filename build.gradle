@@ -24,7 +24,7 @@ project.ext {
 }
 
 group = 'net.minecraftforge.gradle'
-version = "${project.ext.GIT_INFO.tag}.${project.ext.GIT_INFO.offset}"
+version = "2.1"
 archivesBaseName = 'ForgeGradle'
 targetCompatibility = '1.6'
 sourceCompatibility = '1.6'
@@ -160,7 +160,20 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc
     classifier = "javadoc"
 }
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.thefightagainstmalware'
+            artifactId = 'ForgeGradle'
+            version = "2.1-SNAPSHOT"
+            from components.java
 
+            pom {
+                description = 'A description of my library'
+            }
+        }
+    }
+}
 artifacts {
     archives jar
     //archives javadocJar
