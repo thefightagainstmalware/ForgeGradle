@@ -153,8 +153,7 @@ javadoc {
 
     // linked javadoc urls.. why not...
     options.addStringOption 'link', 'https://gradle.org/docs/current/javadoc/'
-    options.addStringOption 'link', 'http://docs.guava-libraries.googlecode.com/git-history/v18.0/javadoc'
-    options.addStringOption 'link', 'http://asm.ow2.org/asm50/javadoc/user/'
+    options.addStringOption 'link', 'https://asm.ow2.org/asm50/javadoc/user/'
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -196,7 +195,7 @@ license {
 }
 
 pluginBundle {
-    website = 'http://www.gradle.org/'
+    website = 'https://www.gradle.org/'
     vcsUrl = 'https://github.com/MinecraftForge/ForgeGradle'
     description = 'Gradle plugin for all Minecraft mod development needs'
     tags = ['forge', 'minecraft', 'minecraftforge', 'sponge', 'mcp']
