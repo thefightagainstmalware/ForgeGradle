@@ -144,7 +144,7 @@ jar {
         attributes 'version':project.version
         attributes 'javaCompliance': project.targetCompatibility
         attributes 'group':project.group
-        attributes 'Implementation-Version': project.version + "-" + GIT_INFO.hash
+        attributes 'Implementation-Version': project.version
     }
 }
 
@@ -169,7 +169,7 @@ publishing {
             from components.java
 
             pom {
-                description = 'A description of my library'
+                description = 'ForgeGradle with https'
             }
         }
     }
