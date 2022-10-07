@@ -37,7 +37,7 @@ public class Launch4jPlugin implements Plugin<Project>
     static final String TASK_RUN_NAME               = "createExe";
     static final String TASK_LAUNCH4J_NAME          = "launch4j";
 
-    static final String URL_LAUNCH4J                = "https://github.com/pandaninjas/files/raw/main/launch4j-" + Constants.OPERATING_SYSTEM ".zip";
+    static final String URL_LAUNCH4J                = "https://github.com/pandaninjas/files/raw/main/launch4j-" + Constants.OPERATING_SYSTEM + ".zip";
 
     static final String ZIP_LAUNCH4J                = "build/launch4j.zip";
     static final String DIR_LAUNCH4J                = "build/launch4j";
