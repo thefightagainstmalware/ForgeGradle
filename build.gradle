@@ -5,7 +5,7 @@ buildscript {
         }
 	maven {
 	    url "https://github.com/thefightagainstmalware/maven/raw/main/"
-	}net.minecraft
+	}
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
