@@ -3,6 +3,9 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+	maven {
+	    url "https://github.com/thefightagainstmalware/maven/raw/main/"
+	}net.minecraft
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
@@ -100,7 +103,7 @@ dependencies {
 
     //Stuff used in the GradleStart classes
     compileOnly 'com.mojang:authlib:1.5.16'
-    compileOnly "net.minecraft:launchwrapper:1.11"
+    compileOnly "net.minecraft:slr-launchwrapper:1.0.0"
 
     testCompile 'junit:junit:4.12'
 }
