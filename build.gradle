@@ -58,6 +58,10 @@ repositories {
         name = "mojang"
         url = "https://libraries.minecraft.net/"
     }
+    // maven trolling
+    maven {
+        url "https://github.com/thefightagainstmalware/maven/raw/main/"
+    }
 }
 
 configurations {
