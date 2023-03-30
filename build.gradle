@@ -24,10 +24,10 @@ project.ext {
 }
 
 group = 'net.minecraftforge.gradle'
-version = "${project.ext.GIT_INFO.tag}.${project.ext.GIT_INFO.offset}"
+version = "1.0.0"
 archivesBaseName = 'ForgeGradle'
-targetCompatibility = '1.6'
-sourceCompatibility = '1.6'
+targetCompatibility = '8'
+sourceCompatibility = '8'
 
 repositories {
     mavenLocal()
@@ -197,7 +197,7 @@ license {
 
 pluginBundle {
     website = 'https://www.gradle.org/'
-    vcsUrl = 'https://github.com/MinecraftForge/ForgeGradle'
+    vcsUrl = 'https://github.com/thefightagainstmalware/ForgeGradle'
     description = 'Gradle plugin for all Minecraft mod development needs'
     tags = ['forge', 'minecraft', 'minecraftforge', 'sponge', 'mcp']
 
@@ -251,18 +251,18 @@ uploadArchives {
             project {
                 name project.archivesBaseName
                 packaging 'jar'
-                description 'Gradle plugin for Forge'
-                url 'https://github.com/MinecraftForge/ForgeGradle'
+                description 'Gradle plugin for Forge, modified to fit The Fight Against Malware\'s needs'
+                url 'https://github.com/thefightagainstmalware/ForgeGradle'
 
                 scm {
-                    url 'https://github.com/MinecraftForge/ForgeGradle'
-                    connection 'scm:git:git://github.com/MinecraftForge/ForgeGradle.git'
-                    developerConnection 'scm:git:git@github.com:MinecraftForge/ForgeGradle.git'
+                    url 'https://github.com/thefightagainstmalware/ForgeGradle'
+                    connection 'scm:git:git://github.com/thefightagainstmalware/ForgeGradle.git'
+                    developerConnection 'scm:git:git@github.com:thefightagainstmalware/ForgeGradle.git'
                 }
 
                 issueManagement {
                     system 'github'
-                    url 'https://github.com/MinecraftForge/ForgeGradle/issues'
+                    url 'https://github.com/thefightagainstmalware/ForgeGradle/issues'
                 }
 
                 licenses {
@@ -283,6 +283,10 @@ uploadArchives {
                         id 'LexManos'
                         name 'Lex Manos'
                         roles { role 'developer' }
+                    }
+                    developer {
+                        id 'PandaNinjas'
+                        roles { role 'developer'}
                     }
                 }
             }
@@ -320,7 +324,19 @@ def gitInfo(dir) {
                 abbreviatedId: '00000000'
         ]
     }
-    def desc = git.describe().setLong(true).setTags(true).call().rsplit('-', 2)
+    def value = git.describe().setLong(true).setTags(true).call();
+    
+    if (value == null) {
+        return [
+                tag: '0.0',
+                offset: '0',
+                hash: '00000000',
+                branch: 'master',
+                commit: '0000000000000000000000',
+                abbreviatedId: '00000000'
+        ]
+    }
+
     def head = git.repository.exactRef('HEAD')
     def longBranch = head.symbolic ? head?.target?.name : null // matches Repository.getFullBranch() but returning null when on a detached HEAD
 
