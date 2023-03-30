@@ -267,7 +267,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         if (!pattern.matcher(project.getVersion().toString()).matches())
         {
             project.getLogger().warn("Version string '"+project.getVersion()+"' does not match SemVer specification ");
-            project.getLogger().warn("You should try SemVer : http://semver.org/");
+            project.getLogger().warn("You should try SemVer : https://semver.org/");
         }
     }
 
@@ -1186,7 +1186,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
                     transformer.setOutputProperty(OutputKeys.METHOD, "xml");
                     transformer.setOutputProperty(OutputKeys.INDENT, "yes");
                     transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                    transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                    transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
 
                     DOMSource source = new DOMSource(doc);
                     StreamResult result = new StreamResult(file);

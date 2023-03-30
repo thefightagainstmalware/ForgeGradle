@@ -130,7 +130,7 @@ result.eachWithIndex { version, index ->
     {
         warn "'${version.version}' doesnt have a 'docUrl' defined!"
     }
-    else if (!version.docUrl.startsWith('http://') && !version.docUrl.startsWith('https://'))
+    else if (!version.docUrl.startsWith('https://') && !version.docUrl.startsWith('https://'))
     {
         warn "'${version.version}' has a 'docUrl' that isnt an HTTP URL"
     }

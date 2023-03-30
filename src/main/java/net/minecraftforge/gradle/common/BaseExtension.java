@@ -140,7 +140,7 @@ public abstract class BaseExtension
      *
      * @return The channel and version in format: {@code channel_version}.
      *
-     * @see <a href="http://export.mcpbot.bspk.rs/">http://export.mcpbot.bspk.rs/</a>
+     * @see <a href="https://export.mcpbot.bspk.rs/">https://export.mcpbot.bspk.rs/</a>
      */
     public String getMappings()
     {
@@ -152,7 +152,7 @@ public abstract class BaseExtension
      *
      * @return The channel
      *
-     * @see <a href="http://export.mcpbot.bspk.rs/">http://export.mcpbot.bspk.rs/</a>
+     * @see <a href="https://export.mcpbot.bspk.rs/">https://export.mcpbot.bspk.rs/</a>
      */
     public String getMappingsChannel()
     {
@@ -178,7 +178,7 @@ public abstract class BaseExtension
      *
      * @return The version
      *
-     * @see <a href="http://export.mcpbot.bspk.rs/">http://export.mcpbot.bspk.rs/</a>
+     * @see <a href="https://export.mcpbot.bspk.rs/">https://export.mcpbot.bspk.rs/</a>
      */
     public String getMappingsVersion()
     {
@@ -192,7 +192,7 @@ public abstract class BaseExtension
      *
      * @param mappings The channel and version
      *
-     * @see <a href="http://export.mcpbot.bspk.rs/">http://export.mcpbot.bspk.rs/</a>
+     * @see <a href="https://export.mcpbot.bspk.rs/">https://export.mcpbot.bspk.rs/</a>
      */
     public void setMappings(String mappings)
     {
