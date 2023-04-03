@@ -41,8 +41,8 @@ public class LiteloaderExtension extends UserBaseExtension
         this.checkVersion(version);
         
         Jar jar = (Jar)project.getTasks().getByName("jar");
-        if (Strings.isNullOrEmpty(jar.getClassifier())) {
-            jar.setClassifier("mc" + version);
+        if (Strings.isNullOrEmpty(jar.getArchiveClassifier().get())) {
+            jar.getArchiveClassifier().set("mc" + version);
         }
     }
 

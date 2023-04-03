@@ -215,10 +215,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             outputJar.from(delayedFile(BINPATCH_RUN));
             outputJar.from(delayedFile(DEOBF_DATA));
             outputJar.from(delayedFile(JSON_UNIVERSAL));
-            outputJar.setBaseName(project.getName());
+            outputJar.getArchiveBaseName().set(project.getName());
             outputJar.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
             outputJar.getOutputs().upToDateWhen(Constants.CALL_FALSE); // rebuild every time.
-            outputJar.setDestinationDir(new File(DIR_OUTPUT));
+            outputJar.getDestinationDirectory().set(new File(DIR_OUTPUT));
             outputJar.dependsOn(genBinPatches, extractObfClasses, compressDeobf, procJson);
         }
 
@@ -240,10 +240,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             installer.from(outputJar);
             installer.from(delayedTree(JAR_INSTALLER), new CopyInto(PatcherPlugin.class, "", "!*.json", "!*.png"));
             installer.from(delayedTree(JSON_INSTALLER));
-            installer.setBaseName(project.getName());
-            installer.setClassifier("installer");
-            installer.setExtension("jar");
-            installer.setDestinationDir(new File(DIR_OUTPUT));
+            installer.getArchiveBaseName().set(project.getName());
+            installer.getArchiveClassifier().set("installer");
+            installer.getArchiveExtension().set("jar");
+            installer.getDestinationDirectory().set(new File(DIR_OUTPUT));
             installer.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
             installer.getOutputs().upToDateWhen(Constants.CALL_FALSE); // rebuild every time.
             installer.dependsOn(dlInstaller, outputJar, procJson);
@@ -264,8 +264,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         Zip combineRes = makeTask(TASK_COMBINE_RESOURCES, Zip.class);
         {
             File out = delayedFile(ZIP_USERDEV_RES).call();
-            combineRes.setDestinationDir(out.getParentFile());
-            combineRes.setArchiveName(out.getName());
+            combineRes.getDestinationDirectory().set(out.getParentFile());
+            combineRes.getArchiveBaseName().set(out.getName());
             combineRes.setIncludeEmptyDirs(false);
             combineRes.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
         }
@@ -286,8 +286,8 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         Zip packagePatches = makeTask(TASK_PATCHES_USERDEV, Zip.class);
         {
             File out = delayedFile(ZIP_USERDEV_PATCHES).call();
-            packagePatches.setDestinationDir(out.getParentFile());
-            packagePatches.setArchiveName(out.getName());
+            packagePatches.getDestinationDirectory().set(out.getParentFile());
+            packagePatches.getArchiveBaseName().set(out.getName());
             packagePatches.from(delayedFile(DIR_USERDEV_PATCHES));
             packagePatches.dependsOn(userdevPatches);
         }
@@ -297,10 +297,10 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
             userdev.from(delayedFile(DIR_USERDEV));
             userdev.from(getExtension().getDelayedVersionJson()); // cant forge that now can we..
             userdev.rename(".+-dev\\.json", "dev.json");
-            userdev.setBaseName(project.getName());
-            userdev.setClassifier("userdev");
-            userdev.setExtension("jar");
-            userdev.setDestinationDir(new File(DIR_OUTPUT));
+            userdev.getArchiveBaseName().set(project.getName());
+            userdev.getArchiveClassifier().set("userdev");
+            userdev.getArchiveExtension().set("jar");
+            userdev.getDestinationDirectory().set(new File(DIR_OUTPUT));
             userdev.setDuplicatesStrategy(DuplicatesStrategy.EXCLUDE);
             userdev.getOutputs().upToDateWhen(Constants.CALL_FALSE); // rebuild every time.
             userdev.dependsOn(genBinPatches, extractObfClasses, packagePatches, extractNonMcSources, combineRes, mergeFiles);
@@ -896,9 +896,9 @@ public class PatcherPlugin extends BasePlugin<PatcherExtension>
         userdevSources.dependsOn(projectString(TASK_PROJECT_RETROMAP, patcher), projectString(TASK_PROJECT_RETRO_NONMC, patcher));
 
         // add version to packaging tasks
-        outputJar.setVersion(project.getVersion().toString());
-        ((Zip)project.getTasks().getByName(TASK_BUILD_USERDEV)).setVersion(project.getVersion().toString());
-        ((Zip)project.getTasks().getByName(TASK_BUILD_INSTALLER)).setVersion(project.getVersion().toString());
+        outputJar.getArchiveVersion().set(project.getVersion().toString());
+        ((Zip)project.getTasks().getByName(TASK_BUILD_USERDEV)).getArchiveVersion().set(project.getVersion().toString());
+        ((Zip)project.getTasks().getByName(TASK_BUILD_INSTALLER)).getArchiveVersion().set(project.getVersion().toString());
 
         // add them to the maven artifatcs
         if (project.getPlugins().hasPlugin("maven"))

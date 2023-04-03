@@ -1,3 +1,6 @@
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.errors.RepositoryNotFoundException
+
 buildscript {
     repositories {
         maven {
@@ -6,7 +9,6 @@ buildscript {
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
-        classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.11.0'
         classpath 'org.eclipse.jgit:org.eclipse.jgit:5.10.0.202012080955-r'
     }
 }
@@ -14,9 +16,8 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 apply plugin: "com.gradle.plugin-publish"
-apply plugin: 'license'
 
 project.ext {
     GIT_INFO = gitInfo(rootProject.file('.'))
@@ -24,10 +25,11 @@ project.ext {
 }
 
 group = 'net.minecraftforge.gradle'
-version = "1.0.0"
+version = "1.1.0"
 archivesBaseName = 'ForgeGradle'
 targetCompatibility = '8'
 sourceCompatibility = '8'
+
 
 repositories {
     mavenLocal()
@@ -40,7 +42,6 @@ repositories {
         name = "eclipse"
         url = "https://repo.eclipse.org/content/groups/eclipse/"
     }
-    jcenter() // get as many deps from here as possible
     mavenCentral()
 
     // because SS and its snapshot
@@ -64,29 +65,29 @@ configurations {
 }
 
 dependencies {
-    compile gradleApi()
+    implementation gradleApi()
 
     // moved to the beginning to be the overrider
-    compile 'org.ow2.asm:asm-debug-all:5.0.3'
-    compile 'com.google.guava:guava:18.0'
+    implementation 'org.ow2.asm:asm-debug-all:5.0.3'
+    implementation 'com.google.guava:guava:18.0'
 
-    compile 'net.sf.opencsv:opencsv:2.3' // reading CSVs.. also used by SpecialSource
-    compile 'com.cloudbees:diff4j:1.1' // for difing and patching
-    compile 'com.github.abrarsyed.jastyle:jAstyle:1.3' // formatting
-    compile 'net.sf.trove4j:trove4j:2.1.0' // because its awesome.
+    implementation 'net.sf.opencsv:opencsv:2.3' // reading CSVs.. also used by SpecialSource
+    implementation 'com.cloudbees:diff4j:1.1' // for difing and patching
+    implementation 'com.github.abrarsyed.jastyle:jAstyle:1.3' // formatting
+    implementation 'net.sf.trove4j:trove4j:2.1.0' // because its awesome.
 
-    compile 'com.github.jponge:lzma-java:1.3' // replaces the LZMA binary
-    compile 'com.nothome:javaxdelta:2.0.1' // GDIFF implementation for BinPatches
-    compile 'com.google.code.gson:gson:2.2.4' // Used instead of Argo for buuilding changelog.
-    compile 'com.github.tony19:named-regexp:0.2.3' // 1.7 Named regexp features
-    compile 'net.minecraftforge:fernflower:2.0-SNAPSHOT' // Fernflower Forge edition
+    implementation 'com.github.jponge:lzma-java:1.3' // replaces the LZMA binary
+    implementation 'com.nothome:javaxdelta:2.0.1' // GDIFF implementation for BinPatches
+    implementation 'com.google.code.gson:gson:2.2.4' // Used instead of Argo for buuilding changelog.
+    implementation 'com.github.tony19:named-regexp:0.2.3' // 1.7 Named regexp features
+    implementation 'net.minecraftforge:fernflower:2.0-SNAPSHOT' // Fernflower Forge edition
 
     shade 'net.md-5:SpecialSource:1.7.4' // deobf and reobs
     // compile 'net.md-5:SpecialSource:1.7.4' // when md5 publishes
 
     // because curse
-    compile 'org.apache.httpcomponents:httpclient:4.3.3'
-    compile 'org.apache.httpcomponents:httpmime:4.3.3'
+    implementation 'org.apache.httpcomponents:httpclient:4.3.3'
+    implementation 'org.apache.httpcomponents:httpmime:4.3.3'
 
     // mcp stuff
     shade 'de.oceanlabs.mcp:RetroGuard:3.6.6'
@@ -94,19 +95,13 @@ dependencies {
     shade 'net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT'
 
     // The old version used by S2S is gone, so we need to force the latest build of that minor release
-    shade('org.eclipse.jdt:org.eclipse.jdt.core:3.10.0.+') {
-        force = true
-    }
+    shade 'org.eclipse.jdt:org.eclipse.jdt.core:3.10.0.+'
 
     //Stuff used in the GradleStart classes
     compileOnly 'com.mojang:authlib:1.5.16'
     compileOnly "net.minecraft:launchwrapper:1.11"
 
-    testCompile 'junit:junit:4.12'
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    testImplementation 'junit:junit:4.12'
 }
 
 sourceSets {
@@ -118,11 +113,10 @@ sourceSets {
 
 compileJava {
 	options.deprecation = true
-	//options.compilerArgs += ["-Werror"]
-	//options.compilerArgs += ["-Werror", "-Xlint:unchecked"]
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
     from(sourceSets.main.resources.srcDirs) {
         include 'forgegradle.version.txt'
         expand 'version': project.version
@@ -133,7 +127,7 @@ processResources {
 }
 
 jar {
-
+    duplicatesStrategy = DuplicatesStrategy.WARN;
     configurations.shade.each { dep ->
         from(project.zipTree(dep)){
             exclude 'META-INF', 'META-INF/**'
@@ -157,11 +151,6 @@ javadoc {
     options.addStringOption 'link', 'https://asm.ow2.org/asm50/javadoc/user/'
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    from javadoc
-    classifier = "javadoc"
-}
-
 artifacts {
     archives jar
     //archives javadocJar
@@ -172,27 +161,6 @@ test {
     exclude "*"
     // if (project.hasProperty("filesmaven")) // disable this test when on the forge jenkins
     //     exclude "**/ExtensionMcpMappingTest*"
-}
-
-license {
-    ext {
-        description = 'A Gradle plugin for the creation of Minecraft mods and MinecraftForge plugins.'
-        year = '2013'
-        fullname = 'Minecraft Forge'
-    }
-    header rootProject.file('HEADER')
-    include '**net/minecraftforge/gradle/**/*.java'
-    excludes ([
-        '**net/minecraftforge/gradle/util/ZipFileTree.java',
-        '**net/minecraftforge/gradle/util/json/version/*',
-        '**net/minecraftforge/gradle/util/patching/Base64.java',
-        '**net/minecraftforge/gradle/util/patching/ContextualPatch.java'
-    ])
-    ignoreFailures false
-    strictCheck true
-    mapping {
-        java = 'SLASHSTAR_STYLE'
-    }
 }
 
 pluginBundle {
@@ -226,74 +194,6 @@ pluginBundle {
     }
 }
 
-uploadArchives {
-    repositories.mavenDeployer {
-
-        dependsOn 'build'
-
-        if (System.env.MAVEN_USER)
-        {
-            repository(url: "https://maven.minecraftforge.net/") {
-                authentication(userName: System.env.MAVEN_USER, password: System.env.MAVEN_PASSWORD)
-            }
-        }
-        else
-        {
-            // local repo folder. Might wanna juset use  gradle install   if you wanans end it to maven-local
-            repository(url: 'file://localhost/' + project.file('repo').getAbsolutePath())
-        }
-
-
-        pom {
-            groupId = project.group
-            version = project.hasProperty('oldFormat') ? OLD_FORMAT : project.version
-            artifactId = project.archivesBaseName
-            project {
-                name project.archivesBaseName
-                packaging 'jar'
-                description 'Gradle plugin for Forge, modified to fit The Fight Against Malware\'s needs'
-                url 'https://github.com/thefightagainstmalware/ForgeGradle'
-
-                scm {
-                    url 'https://github.com/thefightagainstmalware/ForgeGradle'
-                    connection 'scm:git:git://github.com/thefightagainstmalware/ForgeGradle.git'
-                    developerConnection 'scm:git:git@github.com:thefightagainstmalware/ForgeGradle.git'
-                }
-
-                issueManagement {
-                    system 'github'
-                    url 'https://github.com/thefightagainstmalware/ForgeGradle/issues'
-                }
-
-                licenses {
-                    license {
-                        name 'Lesser GNU Public License, Version 2.1'
-                        url 'https://www.gnu.org/licenses/lgpl-2.1.html'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'AbrarSyed'
-                        name 'Abrar Syed'
-                        roles { role 'developer' }
-                    }
-                    developer {
-                        id 'LexManos'
-                        name 'Lex Manos'
-                        roles { role 'developer' }
-                    }
-                    developer {
-                        id 'PandaNinjas'
-                        roles { role 'developer'}
-                    }
-                }
-            }
-        }
-    }
-}
-
 // write out version so its convenient for doc deployment
 file('build').mkdirs()
 file('build/version.txt').text = version;
@@ -313,8 +213,8 @@ def gitInfo(dir) {
 
     def git = null
     try {
-        git = org.eclipse.jgit.api.Git.open(dir)
-    } catch (org.eclipse.jgit.errors.RepositoryNotFoundException e) {
+        git = Git.open(dir)
+    } catch (RepositoryNotFoundException e) {
         return [
                 tag: '0.0',
                 offset: '0',

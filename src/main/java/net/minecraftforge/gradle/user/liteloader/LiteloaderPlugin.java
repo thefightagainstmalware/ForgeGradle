@@ -82,11 +82,11 @@ public class LiteloaderPlugin extends UserVanillaBasePlugin<LiteloaderExtension>
 
         TaskContainer tasks = this.project.getTasks();
         final Jar jar = (Jar)tasks.getByName("jar");
-        jar.setExtension(MODFILE_EXTENSION);
-        jar.setBaseName(baseName);
-        
+        jar.getArchiveExtension().set(MODFILE_EXTENSION);
+        jar.getArchiveBaseName().set(baseName);
+
         final Jar sourceJar = (Jar)tasks.getByName("sourceJar");
-        sourceJar.setBaseName(baseName);
+        sourceJar.getArchiveBaseName().set(baseName);
         
         makeTask(TASK_LITEMOD, LiteModTask.class);
     }
@@ -100,11 +100,9 @@ public class LiteloaderPlugin extends UserVanillaBasePlugin<LiteloaderExtension>
         // If user has changed extension back to .jar, write the ModType
         // manifest attribute
         final Jar jar = (Jar)this.project.getTasks().getByName("jar");
-        if ("jar".equals(jar.getExtension())) {
+        if ("jar".equals(jar.getArchiveExtension().get())) {
             Attributes attributes = jar.getManifest().getAttributes();
-            if (attributes.get(MFATT_MODTYPE) == null) {
-                attributes.put(MFATT_MODTYPE, MODSYSTEM);
-            }
+            attributes.putIfAbsent(MFATT_MODTYPE, MODSYSTEM);
         }
     }
     
