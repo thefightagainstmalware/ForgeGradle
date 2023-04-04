@@ -204,7 +204,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         if (this.hasClientRun())
         {
             JavaExec exec = (JavaExec) project.getTasks().getByName("runClient");
-            exec.classpath(project.getConfigurations().getByName("runtime"));
+            exec.classpath(project.getConfigurations().getByName("runtimeOnly"));
             exec.classpath(project.getConfigurations().getByName(CONFIG_MC));
             exec.classpath(project.getConfigurations().getByName(CONFIG_MC_DEPS));
             exec.classpath(project.getConfigurations().getByName(CONFIG_START));
@@ -217,7 +217,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
         if (this.hasServerRun())
         {
             JavaExec exec = (JavaExec) project.getTasks().getByName("runServer");
-            exec.classpath(project.getConfigurations().getByName("runtime"));
+            exec.classpath(project.getConfigurations().getByName("runtimeOnly"));
             exec.classpath(project.getConfigurations().getByName(CONFIG_MC));
             exec.classpath(project.getConfigurations().getByName(CONFIG_MC_DEPS));
             exec.classpath(project.getConfigurations().getByName(CONFIG_START));
@@ -484,8 +484,7 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.getConfigurations().getByName(CONFIG_DC_RESOLVED));
         project.getConfigurations().getByName(CONFIG_PROVIDED).extendsFrom(project.getConfigurations().getByName(CONFIG_DP_RESOLVED));
-        project.getConfigurations().getByName(api.getImplementationConfigurationName()).extendsFrom(project.getConfigurations().getByName("compile"));
-        project.getConfigurations().getByName(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME).extendsFrom(project.getConfigurations().getByName("apiCompile"));
+        project.getConfigurations().getByName(api.getImplementationConfigurationName()).extendsFrom(project.getConfigurations().getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME));
 
         Javadoc javadoc = (Javadoc) project.getTasks().getByName(JavaPlugin.JAVADOC_TASK_NAME);
         javadoc.setClasspath(main.getOutput().plus(main.getCompileClasspath()));
@@ -577,8 +576,8 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
     protected final void doDevTimeDeobf()
     {
-        final Task compileDummy = getDummyDep("compile", delayedFile(DIR_DEOBF_DEPS + "/compileDummy.jar"), TASK_DD_COMPILE);
-        final Task providedDummy = getDummyDep("compile", delayedFile(DIR_DEOBF_DEPS + "/providedDummy.jar"), TASK_DD_PROVIDED);
+        final Task compileDummy = getDummyDep("implementation", delayedFile(DIR_DEOBF_DEPS + "/compileDummy.jar"), TASK_DD_COMPILE);
+        final Task providedDummy = getDummyDep("implementation", delayedFile(DIR_DEOBF_DEPS + "/providedDummy.jar"), TASK_DD_PROVIDED);
 
         setupDevTimeDeobf(compileDummy, providedDummy);
     }
@@ -1089,64 +1088,60 @@ public abstract class UserBasePlugin<T extends UserBaseExtension> extends BasePl
 
         Task task = makeTask("genIntellijRuns", DefaultTask.class);
         task.doFirst(makeRunDir);
-        task.doLast(new Action<Task>() {
-            @Override
-            public void execute(Task task)
+        task.doLast(task1 -> {
+            try
             {
-                try
-                {
-                    String module = task.getProject().getProjectDir().getCanonicalPath();
+                String module = task1.getProject().getProjectDir().getCanonicalPath();
 
-                    File root = task.getProject().getProjectDir().getCanonicalFile();
-                    File file = null;
-                    while (file == null && !root.equals(task.getProject().getRootProject().getProjectDir().getCanonicalFile().getParentFile()))
+                File root = task1.getProject().getProjectDir().getCanonicalFile();
+                File file = null;
+                while (file == null && !root.equals(task1.getProject().getRootProject().getProjectDir().getCanonicalFile().getParentFile()))
+                {
+                    file = new File(root, ".idea/workspace.xml");
+                    if (!file.exists())
                     {
-                        file = new File(root, ".idea/workspace.xml");
-                        if (!file.exists())
+                        file = null;
+                        // find iws file
+                        for (File f : root.listFiles())
                         {
-                            file = null;
-                            // find iws file
-                            for (File f : root.listFiles())
+                            if (f.isFile() && f.getName().endsWith(".iws"))
                             {
-                                if (f.isFile() && f.getName().endsWith(".iws"))
-                                {
-                                    file = f;
-                                    break;
-                                }
+                                file = f;
+                                break;
                             }
                         }
-
-                        root = root.getParentFile();
                     }
 
-                    if (file == null || !file.exists())
-                        throw new RuntimeException("Intellij workspace file could not be found! are you sure you imported the project into intellij?");
-
-                    DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-                    Document doc = docBuilder.parse(file);
-
-                    injectIntellijRuns(doc, module);
-
-                    // write the content into xml file
-                    TransformerFactory transformerFactory = TransformerFactory.newInstance();
-                    Transformer transformer = transformerFactory.newTransformer();
-                    transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-                    transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-                    transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                    transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-                    transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
-
-                    DOMSource source = new DOMSource(doc);
-                    StreamResult result = new StreamResult(file);
-                    //StreamResult result = new StreamResult(System.out);
-
-                    transformer.transform(source, result);
+                    root = root.getParentFile();
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+
+                if (file == null || !file.exists())
+                    throw new RuntimeException("Intellij workspace file could not be found! are you sure you imported the project into intellij?");
+
+                DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+                DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+                Document doc = docBuilder.parse(file);
+
+                injectIntellijRuns(doc, module);
+
+                // write the content into xml file
+                TransformerFactory transformerFactory = TransformerFactory.newInstance();
+                Transformer transformer = transformerFactory.newTransformer();
+                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+                transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+                transformer.setOutputProperty("{https://xml.apache.org/xslt}indent-amount", "4");
+
+                DOMSource source = new DOMSource(doc);
+                StreamResult result = new StreamResult(file);
+                //StreamResult result = new StreamResult(System.out);
+
+                transformer.transform(source, result);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         });
         task.setGroup(GROUP_FG);
