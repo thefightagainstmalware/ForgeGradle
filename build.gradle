@@ -250,3 +250,41 @@ def gitInfo(dir) {
 
     return ret
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            pom {
+                name = 'ForgeGradle'
+                description = 'A concise description of my library'
+                url = 'https://github.com/thefightagainstmalware/ForgeGradle/'
+                licenses {
+                    license {
+                        name = '                  GNU LESSER GENERAL PUBLIC LICENSE\n' +
+                                '                       Version 2.1'
+                        url = 'https://raw.githubusercontent.com/thefightagainstmalware/ForgeGradle/nosession-main/LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'forgedevs'
+                        name = 'Forge Developers'
+                    }
+
+                    developer {
+                        id = 'pandaninjas'
+                        name = "PandaNinjas"
+                        email = "admin@malwarefight.wip.la"
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com/thefightagainstmalware/ForgeGradle'
+                    developerConnection = 'scm:git:https://github.com/thefightagainstmalware/ForgeGradle'
+                    url = 'https://github.com/thefightagainstmalware/ForgeGradle/'
+                }
+            }
+        }
+    }
+
+}
+
