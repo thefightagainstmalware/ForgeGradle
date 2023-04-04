@@ -283,6 +283,7 @@ publishing {
                     url = 'https://github.com/thefightagainstmalware/ForgeGradle/'
                 }
             }
+            from components.java
         }
     }
 
