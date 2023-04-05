@@ -40,19 +40,22 @@ public class ExtractConfigTask extends CachedTask implements PatternFilterable
     @Input
     private String     config;
 
-    @Input
-    private PatternSet patternSet       = new PatternSet();
+    private final PatternSet patternSet       = new PatternSet();
 
     @Input
     private boolean    includeEmptyDirs = true;
 
-    @Input
-    @Optional
     private boolean    clean            = false;
 
     @Cached
     @OutputDirectory
     private Object     destinationDir   = null;
+
+    @Input
+    private Set<String> excludes = patternSet.getExcludes();
+
+    @Input
+    private Set<String> includes = patternSet.getIncludes();
 
     @TaskAction
     public void doTask() throws IOException
@@ -75,7 +78,7 @@ public class ExtractConfigTask extends CachedTask implements PatternFilterable
         }
     }
 
-    private void delete(File f) throws IOException
+    private void delete(File f)
     {
         if (f.isDirectory())
         {
@@ -157,7 +160,6 @@ public class ExtractConfigTask extends CachedTask implements PatternFilterable
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public PatternFilterable exclude(Closure arg0)
     {
         return patternSet.exclude(arg0);
@@ -166,13 +168,15 @@ public class ExtractConfigTask extends CachedTask implements PatternFilterable
     @Override
     public Set<String> getExcludes()
     {
-        return patternSet.getExcludes();
+        excludes = patternSet.getExcludes();
+        return excludes;
     }
 
     @Override
     public Set<String> getIncludes()
     {
-        return patternSet.getIncludes();
+        includes = patternSet.getIncludes();
+        return includes;
     }
 
     @Override

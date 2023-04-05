@@ -35,10 +35,7 @@ import org.gradle.api.file.FileTreeElement;
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;
 import org.gradle.api.specs.Spec;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 import org.gradle.api.tasks.util.PatternFilterable;
 import org.gradle.api.tasks.util.PatternSet;
 
@@ -49,7 +46,7 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
     @InputFile
     private Object     inJar;
 
-    @Input
+    @Internal
     private PatternSet pattern = new PatternSet();
 
     @Cached
@@ -60,6 +57,12 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
     @OutputFile
     private Object     outSecond;
 
+    @Input
+    private Set<String> excludes;
+
+
+    @Input
+    private Set<String> includes;
     @TaskAction
     public void doTask() throws IOException
     {
@@ -119,6 +122,10 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
         zout2.close();
     }
 
+    public PatternSet getPattern() {
+        return pattern;
+    }
+
     public File getInJar()
     {
         return getProject().file(inJar);
@@ -168,7 +175,6 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public PatternFilterable exclude(Closure arg0)
     {
         return pattern.exclude(arg0);
@@ -177,13 +183,15 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
     @Override
     public Set<String> getExcludes()
     {
-        return pattern.getExcludes();
+        excludes = pattern.getExcludes();
+        return excludes;
     }
 
     @Override
     public Set<String> getIncludes()
     {
-        return pattern.getIncludes();
+        includes = pattern.getIncludes();
+        return includes;
     }
 
     @Override

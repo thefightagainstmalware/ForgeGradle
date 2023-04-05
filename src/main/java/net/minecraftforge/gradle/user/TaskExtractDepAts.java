@@ -20,11 +20,11 @@
 package net.minecraftforge.gradle.user;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -34,6 +34,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
@@ -45,8 +46,8 @@ import com.google.common.io.Files;
 
 public class TaskExtractDepAts extends DefaultTask
 {
-    @Input
-    private List<String> configurations = Lists.newArrayList();
+    @InputFiles
+    private ArrayList<String> collections = Lists.newArrayList();
     @OutputDirectory
     private Object               outputDir;
 
@@ -55,16 +56,10 @@ public class TaskExtractDepAts extends DefaultTask
     {
         FileCollection col = getCollections();
         File outputDir = getOutputDir();
-        outputDir.mkdirs(); // make sur eit exists
+        outputDir.mkdirs(); // make sur it exists
         
         // make a list of things to delete...
-        List<File> toDelete = Lists.newArrayList(outputDir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File f)
-            {
-                return f.isFile();
-            }
-        }));
+        List<File> toDelete = Lists.newArrayList(outputDir.listFiles(f -> f.isFile()));
 
         Splitter splitter = Splitter.on(' ');
 
@@ -112,15 +107,15 @@ public class TaskExtractDepAts extends DefaultTask
 
     public FileCollection getCollections()
     {
-    	List<Configuration> configs = Lists.newArrayListWithCapacity(configurations.size());
-    	for (String s : configurations)
+    	List<Configuration> configs = Lists.newArrayListWithCapacity(collections.size());
+    	for (String s : collections)
     		configs.add(getProject().getConfigurations().getByName(s));
         return getProject().files(configs);
     }
 
     public void addCollection(String col)
     {
-        configurations.add(col);
+        collections.add(col);
     }
 
     public File getOutputDir()

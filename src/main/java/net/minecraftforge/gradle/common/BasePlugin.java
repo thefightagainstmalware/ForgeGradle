@@ -27,6 +27,7 @@ import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -230,10 +231,18 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 "ext", "zip"
                 ));
 
+        project.getRepositories().maven(mavenArtifactRepository -> {
+            try {
+                mavenArtifactRepository.getMetadataSources().artifact(); // mappings don't have pom
+                mavenArtifactRepository.setUrl(new URL("https://repo.papermc.io/repository/maven-public/"));
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            }
+        });
         project.getDependencies().add(CONFIG_MCP_DATA, ImmutableMap.of(
                 "group", "de.oceanlabs.mcp",
                 "name", "mcp",
-                "version", delayedString(REPLACE_MC_VERSION).call(),
+                "version", "1.8.9",
                 "classifier", "srg",
                 "ext", "zip"
                 ));

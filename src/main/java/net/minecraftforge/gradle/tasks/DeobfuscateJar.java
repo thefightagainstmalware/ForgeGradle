@@ -37,12 +37,7 @@ import java.util.Set;
 import java.util.zip.ZipFile;
 
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.tasks.Input;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.InputFiles;
-import org.gradle.api.tasks.Optional;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
+import org.gradle.api.tasks.*;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -100,6 +95,7 @@ public class DeobfuscateJar extends CachedTask
     @InputFiles
     private ArrayList<Object> ats           = Lists.newArrayList();
 
+    @Internal
     private Object            log;
 
     @TaskAction
@@ -431,23 +427,7 @@ public class DeobfuscateJar extends CachedTask
         this.outJar = outJar;
     }
 
-    /**
-     * returns the actual output Object depending on Clean status
-     * Unlike getOutputJar() this method does not resolve the files.
-     * @return Object that will resolve to
-     */
-    @SuppressWarnings("serial")
-    public Closure<File> getDelayedOutput()
-    {
-        return new Closure<File>(DeobfuscateJar.class) {
-            public File call()
-            {
-                return getOutJar();
-            }
-        };
-    }
-
-    /**
+        /**
      * adds an access transformer to the deobfuscation of this
      * @param obj access transformers
      */
