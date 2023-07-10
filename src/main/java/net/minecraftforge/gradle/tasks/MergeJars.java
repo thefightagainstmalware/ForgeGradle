@@ -19,6 +19,7 @@
  */
 package net.minecraftforge.gradle.tasks;
 
+import java.nio.file.attribute.FileTime;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -139,6 +140,7 @@ public class MergeJars extends CachedTask
                 byte[] data = processClass(cData, sData);
 
                 ZipEntry newEntry = new ZipEntry(cEntry.getName());
+                newEntry.setCreationTime(FileTime.from(0L));
                 outJar.putNextEntry(newEntry);
                 outJar.write(data);
                 cAdded.add(name);
@@ -160,6 +162,7 @@ public class MergeJars extends CachedTask
                 ZipEntry newEntry = new ZipEntry(classPath);
                 if (!cAdded.contains(eName))
                 {
+                    newEntry.setCreationTime(FileTime.from(0L));
                     outJar.putNextEntry(newEntry);
                     outJar.write(getClassBytes(name));
                 }
