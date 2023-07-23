@@ -19,26 +19,23 @@
  */
 package net.minecraftforge.gradle.tasks;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.caching.CachedTask;
 import net.minecraftforge.gradle.util.delayed.DelayedFile;
 import net.minecraftforge.gradle.util.delayed.DelayedString;
-
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 public class ObtainFernFlowerTask extends CachedTask
 {
@@ -50,7 +47,7 @@ public class ObtainFernFlowerTask extends CachedTask
     private DelayedFile ffJar;
 
     @TaskAction
-    public void doTask() throws MalformedURLException, IOException
+    public void doTask() throws IOException
     {
         if (getProject().getGradle().getStartParameter().isOffline())
         {
@@ -70,7 +67,7 @@ public class ObtainFernFlowerTask extends CachedTask
         connect.setInstanceFollowRedirects(true);
 
         final ZipInputStream zin = new ZipInputStream(connect.getInputStream());
-        ZipEntry entry = null;
+        ZipEntry entry;
 
         while ((entry = zin.getNextEntry()) != null)
         {

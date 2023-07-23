@@ -32,7 +32,7 @@ import groovy.lang.Closure;
 import net.minecraftforge.gradle.common.BaseExtension;
 import net.minecraftforge.gradle.common.Constants;
 import org.gradle.api.file.FileCollection;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 
 public class UserBaseExtension extends BaseExtension
@@ -403,7 +403,7 @@ public class UserBaseExtension extends BaseExtension
             set = (SourceSet) obj;
         else if (obj instanceof String)
         {
-            JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
+            JavaPluginExtension javaConv = (JavaPluginExtension) project.getExtensions().getByName("java");
             set = javaConv.getSourceSets().findByName((String) obj);
         }
 

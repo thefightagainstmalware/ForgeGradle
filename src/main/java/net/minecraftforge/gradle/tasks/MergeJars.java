@@ -140,7 +140,9 @@ public class MergeJars extends CachedTask
                 byte[] data = processClass(cData, sData);
 
                 ZipEntry newEntry = new ZipEntry(cEntry.getName());
-                newEntry.setCreationTime(FileTime.from(0L));
+                newEntry.setLastAccessTime(FileTime.fromMillis(0L));
+                newEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                newEntry.setCreationTime(FileTime.fromMillis(0L));
                 outJar.putNextEntry(newEntry);
                 outJar.write(data);
                 cAdded.add(name);
@@ -160,9 +162,11 @@ public class MergeJars extends CachedTask
                 String eName = name.replace(".", "/");
                 String classPath = eName + ".class";
                 ZipEntry newEntry = new ZipEntry(classPath);
+                newEntry.setLastAccessTime(FileTime.fromMillis(0L));
+                newEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                newEntry.setCreationTime(FileTime.fromMillis(0L));
                 if (!cAdded.contains(eName))
                 {
-                    newEntry.setCreationTime(FileTime.from(0L));
                     outJar.putNextEntry(newEntry);
                     outJar.write(getClassBytes(name));
                 }
@@ -212,7 +216,7 @@ public class MergeJars extends CachedTask
 
         if (classNode.visibleAnnotations == null)
         {
-            classNode.visibleAnnotations = new ArrayList<AnnotationNode>();
+            classNode.visibleAnnotations = new ArrayList<>();
         }
         classNode.visibleAnnotations.add(getSideAnn(isClientOnly));
 
@@ -223,6 +227,9 @@ public class MergeJars extends CachedTask
         ZipEntry newEntry = new ZipEntry(entry.getName());
         if (outJar != null)
         {
+            newEntry.setLastAccessTime(FileTime.fromMillis(0L));
+            newEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+            newEntry.setCreationTime(FileTime.fromMillis(0L));
             outJar.putNextEntry(newEntry);
             outJar.write(data);
         }
@@ -251,7 +258,7 @@ public class MergeJars extends CachedTask
      */
     private HashMap<String, ZipEntry> getClassEntries(ZipFile inFile, ZipOutputStream outFile, HashSet<String> resources) throws IOException
     {
-        HashMap<String, ZipEntry> ret = new HashMap<String, ZipEntry>();
+        HashMap<String, ZipEntry> ret = new HashMap<>();
 
         for (ZipEntry entry : Collections.list(inFile.entries()))
         {
@@ -277,6 +284,9 @@ public class MergeJars extends CachedTask
                 if (!resources.contains(entryName))
                 {
                     ZipEntry newEntry = new ZipEntry(entryName);
+                    newEntry.setLastAccessTime(FileTime.fromMillis(0L));
+                    newEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                    newEntry.setCreationTime(FileTime.fromMillis(0L));
                     outFile.putNextEntry(newEntry);
                     outFile.write(readEntry(inFile, entry));
                     resources.add(entryName);

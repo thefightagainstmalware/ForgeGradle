@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
 import java.util.Set;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
@@ -187,6 +188,9 @@ public class TaskRecompileMc extends CachedTask
 
                 entries.add(name);
                 ZipEntry entry = new ZipEntry(name);
+                entry.setLastAccessTime(FileTime.fromMillis(0L));
+                entry.setLastModifiedTime(FileTime.fromMillis(0L));
+                entry.setCreationTime(FileTime.fromMillis(0L));
                 zout.putNextEntry(entry);
             }
             catch (IOException e)
@@ -206,7 +210,11 @@ public class TaskRecompileMc extends CachedTask
                     return;
 
                 entries.add(name);
-                zout.putNextEntry(new ZipEntry(name));
+                ZipEntry n = new ZipEntry(name);
+                n.setLastAccessTime(FileTime.fromMillis(0L));
+                n.setLastModifiedTime(FileTime.fromMillis(0L));
+                n.setCreationTime(FileTime.fromMillis(0L));
+                zout.putNextEntry(n);
 
                 file.copyTo(zout);
             }

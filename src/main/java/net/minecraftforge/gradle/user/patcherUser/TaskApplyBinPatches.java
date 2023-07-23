@@ -19,13 +19,25 @@
  */
 package net.minecraftforge.gradle.user.patcherUser;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import com.google.common.base.Joiner;
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
+import com.google.common.io.ByteArrayDataInput;
+import com.google.common.io.ByteStreams;
+import com.nothome.delta.GDiffPatcher;
+import lzma.sdk.lzma.Decoder;
+import lzma.streams.LzmaInputStream;
+import net.minecraftforge.gradle.util.caching.Cached;
+import net.minecraftforge.gradle.util.caching.CachedTask;
+import org.gradle.api.file.FileVisitDetails;
+import org.gradle.api.file.FileVisitor;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
+
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,29 +46,7 @@ import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.regex.Pattern;
-import java.util.zip.Adler32;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
-import java.util.zip.ZipOutputStream;
-
-import org.gradle.api.file.FileVisitDetails;
-import org.gradle.api.file.FileVisitor;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Throwables;
-import com.google.common.collect.Maps;
-import com.google.common.io.ByteArrayDataInput;
-import com.google.common.io.ByteStreams;
-import com.nothome.delta.GDiffPatcher;
-
-import lzma.sdk.lzma.Decoder;
-import lzma.streams.LzmaInputStream;
-import net.minecraftforge.gradle.util.caching.Cached;
-import net.minecraftforge.gradle.util.caching.CachedTask;
+import java.util.zip.*;
 
 public class TaskApplyBinPatches extends CachedTask
 {
@@ -85,8 +75,8 @@ public class TaskApplyBinPatches extends CachedTask
         }
 
         ZipFile in = new ZipFile(getInJar());
-        ZipInputStream classesIn = new ZipInputStream(new FileInputStream(getClassJar()));
-        final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(getOutJar())));
+        ZipInputStream classesIn = new ZipInputStream(Files.newInputStream(getClassJar().toPath()));
+        final ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(getOutJar().toPath())));
         final HashSet<String> entries = new HashSet<String>();
 
         try
@@ -100,12 +90,17 @@ public class TaskApplyBinPatches extends CachedTask
 
                 if (e.isDirectory())
                 {
+                    e.setLastAccessTime(FileTime.fromMillis(0L));
+                    e.setLastModifiedTime(FileTime.fromMillis(0L));
+                    e.setCreationTime(FileTime.fromMillis(0L));
                     out.putNextEntry(e);
                 }
                 else
                 {
                     ZipEntry n = new ZipEntry(e.getName());
-                    n.setTime(e.getTime());
+                    n.setLastAccessTime(FileTime.fromMillis(0L));
+                    n.setLastModifiedTime(FileTime.fromMillis(0L));
+                    n.setCreationTime(FileTime.fromMillis(0L));
                     out.putNextEntry(n);
 
                     byte[] data = ByteStreams.toByteArray(in.getInputStream(e));
@@ -139,6 +134,9 @@ public class TaskApplyBinPatches extends CachedTask
                 if (entries.contains(entry.getName()))
                     continue;
 
+                entry.setLastAccessTime(FileTime.fromMillis(0L));
+                entry.setLastModifiedTime(FileTime.fromMillis(0L));
+                entry.setCreationTime(FileTime.fromMillis(0L));
                 out.putNextEntry(entry);
                 out.write(ByteStreams.toByteArray(classesIn));
                 entries.add(entry.getName());
@@ -160,7 +158,9 @@ public class TaskApplyBinPatches extends CachedTask
                         if (!entries.contains(name))
                         {
                             ZipEntry n = new ZipEntry(name);
-                            n.setTime(file.getLastModified());
+                            n.setLastAccessTime(FileTime.fromMillis(0L));
+                            n.setLastModifiedTime(FileTime.fromMillis(0L));
+                            n.setCreationTime(FileTime.fromMillis(0L));
                             out.putNextEntry(n);
                             ByteStreams.copy(file.open(), out);
                             entries.add(name);

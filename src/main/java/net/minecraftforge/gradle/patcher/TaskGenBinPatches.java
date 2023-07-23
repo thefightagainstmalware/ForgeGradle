@@ -38,6 +38,7 @@ import java.util.jar.JarOutputStream;
 import java.util.jar.Pack200;
 import java.util.jar.Pack200.Packer;
 import java.util.zip.Adler32;
+import java.nio.file.attribute.FileTime;
 
 import lzma.streams.LzmaOutputStream;
 
@@ -233,7 +234,11 @@ class TaskGenBinPatches extends DefaultTask
         JarOutputStream jar = new JarOutputStream(out);
         for (Map.Entry<String, byte[]> entry : patches.entrySet())
         {
-            jar.putNextEntry(new JarEntry("binpatch/" + entry.getKey()));
+            JarEntry jarEntry = new JarEntry("binpatch/" + entry.getKey());
+            jarEntry.setCreationTime(FileTime.fromMillis(0L));
+            jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+            jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+            jar.putNextEntry(jarEntry);
             jar.write(entry.getValue());
         }
         jar.close();

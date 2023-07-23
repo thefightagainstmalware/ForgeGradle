@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
@@ -106,7 +107,11 @@ public class TaskSingleDeobfBin extends CachedTask
                 {
                     Manifest mf = new Manifest(zin);
                     mf.getEntries().clear();
-                    zout.putNextEntry(new JarEntry(entry.getName()));
+                    JarEntry n = new JarEntry(entry.getName());
+                    n.setLastAccessTime(FileTime.fromMillis(0L));
+                    n.setLastModifiedTime(FileTime.fromMillis(0L));
+                    n.setCreationTime(FileTime.fromMillis(0L));
+                    zout.putNextEntry(n);
                     mf.write(zout);
                     zout.closeEntry();
                     continue;
@@ -116,14 +121,22 @@ public class TaskSingleDeobfBin extends CachedTask
             // resources or directories.
             if (entry.isDirectory() || !entry.getName().endsWith(".class"))
             {
-                zout.putNextEntry(new JarEntry(entry));
+                JarEntry n = new JarEntry(entry);
+                n.setLastAccessTime(FileTime.fromMillis(0L));
+                n.setLastModifiedTime(FileTime.fromMillis(0L));
+                n.setCreationTime(FileTime.fromMillis(0L));
+                zout.putNextEntry(n);
                 ByteStreams.copy(zin, zout);
                 zout.closeEntry();
             }
             else
             {
                 // classes
-                zout.putNextEntry(new JarEntry(entry.getName()));
+                ZipEntry n = new JarEntry(entry.getName());
+                n.setLastAccessTime(FileTime.fromMillis(0L));
+                n.setLastModifiedTime(FileTime.fromMillis(0L));
+                n.setCreationTime(FileTime.fromMillis(0L));
+                zout.putNextEntry(n);
                 zout.write(deobfClass(ByteStreams.toByteArray(zin), methods, fields));
                 zout.closeEntry();
             }

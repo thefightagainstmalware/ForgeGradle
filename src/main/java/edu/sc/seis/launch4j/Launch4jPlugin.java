@@ -160,7 +160,7 @@ public class Launch4jPlugin implements Plugin<Project>
             {
                 Launch4jPluginExtension ext = ((Launch4jPluginExtension) task.getProject().getExtensions().getByName(Launch4jPlugin.LAUNCH4J_CONFIGURATION_NAME));
 
-                task.setMain("net.sf.launch4j.Main");
+                task.getMainClass().set("net.sf.launch4j.Main");
                 task.args(project.getBuildDir() + "/" + ext.getOutputDir() + "/" + ext.getXmlFileName());
                 task.setWorkingDir(project.file(ext.getChdir()));
                 task.setClasspath(project.fileTree(launch4JDir));

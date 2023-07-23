@@ -69,7 +69,6 @@ import net.minecraftforge.gradle.tasks.GenSrgs;
 import net.minecraftforge.gradle.tasks.MergeJars;
 import net.minecraftforge.gradle.tasks.SignJar;
 import net.minecraftforge.gradle.tasks.SplitJarTask;
-import net.minecraftforge.gradle.util.FileLogListenner;
 import net.minecraftforge.gradle.util.GradleConfigurationException;
 import net.minecraftforge.gradle.util.delayed.DelayedFile;
 import net.minecraftforge.gradle.util.delayed.DelayedFileTree;
@@ -124,11 +123,6 @@ public abstract class BasePlugin<K extends BaseExtension> implements Plugin<Proj
                 projectCacheDir = new File(project.getProjectDir(), ".gradle");
 
             replacer.putReplacement(REPLACE_PROJECT_CACHE_DIR, projectCacheDir.getAbsolutePath());
-
-            FileLogListenner listener = new FileLogListenner(new File(projectCacheDir, "gradle.log"));
-            project.getLogging().addStandardOutputListener(listener);
-            project.getLogging().addStandardErrorListener(listener);
-            project.getGradle().addBuildListener(listener);
         }
 
         // extension objects

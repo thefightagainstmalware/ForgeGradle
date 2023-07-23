@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.nio.file.attribute.FileTime;
 
 import net.minecraftforge.gradle.util.SequencedInputSupplier;
 import net.minecraftforge.srg2source.util.io.FolderSupplier;
@@ -85,7 +86,11 @@ class TaskExtractNew extends DefaultTask
                 continue;
             }
 
-            zout.putNextEntry(new ZipEntry(path));
+            ZipEntry entry = new ZipEntry(path);
+            entry.setCreationTime(FileTime.fromMillis(0L));
+            entry.setLastAccessTime(FileTime.fromMillis(0L));
+            entry.setLastModifiedTime(FileTime.fromMillis(0L));
+            zout.putNextEntry(entry);
 
             InputStream stream = dirtySupplier.getInput(path);
             ByteStreams.copy(stream, zout);

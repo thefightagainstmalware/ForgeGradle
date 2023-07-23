@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.nio.file.attribute.FileTime;
 
 import net.minecraftforge.gradle.util.caching.Cached;
 import net.minecraftforge.gradle.util.caching.CachedTask;
@@ -94,8 +95,9 @@ public class SplitJarTask extends CachedTask implements PatternFilterable
             {
                 JarEntry entry = new JarEntry(details.getPath());
                 entry.setSize(details.getSize());
-                entry.setTime(details.getLastModified());
-
+                entry.setCreationTime(FileTime.fromMillis(0L));
+                entry.setLastAccessTime(FileTime.fromMillis(0L));
+                entry.setLastModifiedTime(FileTime.fromMillis(0L));
                 try
                 {
                     if (spec.isSatisfiedBy(details))

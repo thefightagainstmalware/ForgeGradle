@@ -33,7 +33,7 @@ import java.io.File;
 
 import org.gradle.api.Action;
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 import org.gradle.api.tasks.SourceSet;
 
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +58,7 @@ public abstract class PatcherUserBasePlugin<T extends UserBaseExtension> extends
         String local = DIR_LOCAL_CACHE + "/" + REPLACE_API_NAME + "%s-" + REPLACE_API_VERSION + "-PROJECT(" + project.getName() + ")";
 
         // grab ATs from resource dirs
-        JavaPluginConvention javaConv = (JavaPluginConvention) project.getConvention().getPlugins().get("java");
+        JavaPluginExtension javaConv = (JavaPluginExtension) project.getExtensions().getByName("java");
         SourceSet main = javaConv.getSourceSets().getByName("main");
         SourceSet api = javaConv.getSourceSets().getByName("api");
 

@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.nio.file.attribute.FileTime;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.OutputFile;
@@ -42,7 +43,11 @@ public class TaskDepDummy extends DefaultTask
         
         // yup.. a dummy jar....
         JarOutputStream stream = new JarOutputStream(new FileOutputStream(out));
-        stream.putNextEntry(new JarEntry("dummyThing"));
+        JarEntry jarEntry = new JarEntry("dummyThing");
+        jarEntry.setCreationTime(FileTime.fromMillis(0L));
+        jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+        jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+        stream.putNextEntry(jarEntry);
         stream.write(0xffffffff);
         stream.closeEntry();
         stream.close();

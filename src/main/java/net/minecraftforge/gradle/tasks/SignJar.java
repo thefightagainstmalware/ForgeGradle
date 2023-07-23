@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.nio.file.attribute.FileTime;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileTreeElement;
@@ -112,6 +113,9 @@ public class SignJar extends DefaultTask implements PatternFilterable
                 {
                     String path = details.getPath();
                     ZipEntry entry = new ZipEntry(path.endsWith("/") ? path : path + "/");
+                    entry.setCreationTime(FileTime.fromMillis(0L));
+                    entry.setLastAccessTime(FileTime.fromMillis(0L));
+                    entry.setLastModifiedTime(FileTime.fromMillis(0L));
                     outs.putNextEntry(entry);
                 }
                 catch (IOException e)
@@ -129,7 +133,9 @@ public class SignJar extends DefaultTask implements PatternFilterable
                     if (spec.isSatisfiedBy(details))
                     {
                         ZipEntry entry = new ZipEntry(details.getPath());
-                        entry.setTime(details.getLastModified());
+                        entry.setCreationTime(FileTime.fromMillis(0L));
+                        entry.setLastAccessTime(FileTime.fromMillis(0L));
+                        entry.setLastModifiedTime(FileTime.fromMillis(0L));
                         outs.putNextEntry(entry);
                         details.copyTo(outs);
                         outs.closeEntry();
@@ -163,12 +169,17 @@ public class SignJar extends DefaultTask implements PatternFilterable
         {
             if (e.isDirectory())
             {
+                e.setCreationTime(FileTime.fromMillis(0L));
+                e.setLastAccessTime(FileTime.fromMillis(0L));
+                e.setLastModifiedTime(FileTime.fromMillis(0L));
                 outs.putNextEntry(e);
             }
             else
             {
                 ZipEntry n = new ZipEntry(e.getName());
-                n.setTime(e.getTime());
+                n.setCreationTime(FileTime.fromMillis(0L));
+                n.setLastAccessTime(FileTime.fromMillis(0L));
+                n.setLastModifiedTime(FileTime.fromMillis(0L));
                 outs.putNextEntry(n);
                 ByteStreams.copy(base.getInputStream(e), outs);
                 outs.closeEntry();
@@ -179,7 +190,9 @@ public class SignJar extends DefaultTask implements PatternFilterable
         for (Map.Entry<String, Map.Entry<byte[], Long>> e : unsigned.entrySet())
         {
             ZipEntry n = new ZipEntry(e.getKey());
-            n.setTime(e.getValue().getValue());
+            n.setCreationTime(FileTime.fromMillis(0L));
+            n.setLastAccessTime(FileTime.fromMillis(0L));
+            n.setLastModifiedTime(FileTime.fromMillis(0L));
             outs.putNextEntry(n);
             outs.write(e.getValue().getKey());
             outs.closeEntry();

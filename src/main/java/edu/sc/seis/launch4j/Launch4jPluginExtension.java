@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.regex.Pattern;
 
 import org.gradle.api.Project;
-import org.gradle.api.plugins.JavaPluginConvention;
+import org.gradle.api.plugins.JavaPluginExtension;
 
 
 public class Launch4jPluginExtension implements Serializable
@@ -63,7 +63,7 @@ public class Launch4jPluginExtension implements Serializable
         outfile = project.getName()+".exe";
         version = (String)project.getVersion();
         
-        JavaPluginConvention javaConv = (JavaPluginConvention)project.getConvention().getPlugins().get("java");
+        JavaPluginExtension javaConv = (JavaPluginExtension) project.getExtensions().getByName("java");
         if (javaConv != null)
         {
             jreMinVersion = javaConv.getTargetCompatibility().toString();

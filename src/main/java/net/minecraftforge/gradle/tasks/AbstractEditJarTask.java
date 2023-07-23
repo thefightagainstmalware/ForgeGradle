@@ -23,12 +23,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
+import java.nio.file.attribute.FileTime;
 
 import net.minecraftforge.gradle.common.Constants;
 import net.minecraftforge.gradle.util.caching.Cached;
@@ -120,15 +122,15 @@ public abstract class AbstractEditJarTask extends CachedTask
      */
     protected abstract boolean storeJarInRam();
 
-    private final void readAndStoreJarInRam(File jar, Map<String, String> sourceMap, Map<String, byte[]> resourceMap) throws Exception
+    private void readAndStoreJarInRam(File jar, Map<String, String> sourceMap, Map<String, byte[]> resourceMap) throws Exception
     {
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(jar));
-        ZipEntry entry = null;
+        ZipInputStream zin = new ZipInputStream(Files.newInputStream(jar.toPath()));
+        ZipEntry entry;
         String fileStr;
 
         while ((entry = zin.getNextEntry()) != null)
         {
-            // ignore META-INF, it shouldnt be here. If it is we remove it from the output jar.
+            // ignore META-INF, it shouldn't be here. If it is we remove it from the output jar.
             if (entry.getName().contains("META-INF"))
             {
                 continue;
@@ -166,7 +168,11 @@ public abstract class AbstractEditJarTask extends CachedTask
         // write in resources
         for (Map.Entry<String, byte[]> entry : resourceMap.entrySet())
         {
-            zout.putNextEntry(new JarEntry(entry.getKey()));
+            JarEntry jarEntry = new JarEntry(entry.getKey());
+            jarEntry.setCreationTime(FileTime.fromMillis(0L));
+            jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+            jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+            zout.putNextEntry(jarEntry);
             zout.write(entry.getValue());
             zout.closeEntry();
         }
@@ -174,7 +180,11 @@ public abstract class AbstractEditJarTask extends CachedTask
         // write in sources
         for (Map.Entry<String, String> entry : sourceMap.entrySet())
         {
-            zout.putNextEntry(new JarEntry(entry.getKey()));
+            JarEntry jarEntry = new JarEntry(entry.getKey());
+            jarEntry.setCreationTime(FileTime.fromMillis(0L));
+            jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+            jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+            zout.putNextEntry(jarEntry);
             zout.write(entry.getValue().getBytes());
             zout.closeEntry();
         }
@@ -185,9 +195,9 @@ public abstract class AbstractEditJarTask extends CachedTask
     private void copyJar(File input, File output) throws Exception
     {
         // begin reading jar
-        ZipInputStream zin = new ZipInputStream(new FileInputStream(input));
-        JarOutputStream zout = new JarOutputStream(new FileOutputStream(output));
-        ZipEntry entry = null;
+        ZipInputStream zin = new ZipInputStream(Files.newInputStream(input.toPath()));
+        JarOutputStream zout = new JarOutputStream(Files.newOutputStream(output.toPath()));
+        ZipEntry entry;
 
         while ((entry = zin.getNextEntry()) != null)
         {
@@ -202,14 +212,22 @@ public abstract class AbstractEditJarTask extends CachedTask
             {
                 if (entry.isDirectory() || !entry.getName().endsWith(".java"))
                 {
-                    zout.putNextEntry(new JarEntry(entry));
+                    JarEntry jarEntry = new JarEntry(entry);
+                    jarEntry.setCreationTime(FileTime.fromMillis(0L));
+                    jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+                    jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                    zout.putNextEntry(jarEntry);
                     ByteStreams.copy(zin, zout);
                     zout.closeEntry();
                 }
                 else
                 {
                     // source
-                    zout.putNextEntry(new JarEntry(entry.getName()));
+                    JarEntry jarEntry = new JarEntry(entry);
+                    jarEntry.setCreationTime(FileTime.fromMillis(0L));
+                    jarEntry.setLastAccessTime(FileTime.fromMillis(0L));
+                    jarEntry.setLastModifiedTime(FileTime.fromMillis(0L));
+                    zout.putNextEntry(jarEntry);
                     zout.write(asRead(entry.getName(), new String(ByteStreams.toByteArray(zin), Constants.CHARSET)).getBytes());
                     zout.closeEntry();
                 }

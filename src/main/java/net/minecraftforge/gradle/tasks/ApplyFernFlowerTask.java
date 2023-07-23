@@ -19,12 +19,24 @@
  */
 package net.minecraftforge.gradle.tasks;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import net.minecraftforge.gradle.common.Constants;
+import net.minecraftforge.gradle.util.caching.Cached;
+import net.minecraftforge.gradle.util.caching.CachedTask;
+import org.gradle.api.file.FileCollection;
+import org.gradle.api.tasks.InputFile;
+import org.gradle.api.tasks.OutputFile;
+import org.gradle.api.tasks.TaskAction;
+import org.jetbrains.java.decompiler.code.CodeConstants;
+import org.jetbrains.java.decompiler.main.DecompilerContext;
+import org.jetbrains.java.decompiler.main.decompiler.BaseDecompiler;
+import org.jetbrains.java.decompiler.main.decompiler.PrintStreamLogger;
+import org.jetbrains.java.decompiler.main.extern.*;
+import org.jetbrains.java.decompiler.struct.StructMethod;
+import org.jetbrains.java.decompiler.util.InterpreterUtil;
+import org.jetbrains.java.decompiler.util.JADNameProvider;
+
+import java.io.*;
+import java.nio.file.attribute.FileTime;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -36,28 +48,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-
-import net.minecraftforge.gradle.common.Constants;
-import net.minecraftforge.gradle.util.caching.Cached;
-import net.minecraftforge.gradle.util.caching.CachedTask;
-
-import org.gradle.api.file.FileCollection;
-import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.OutputFile;
-import org.gradle.api.tasks.TaskAction;
-import org.jetbrains.java.decompiler.code.CodeConstants;
-import org.jetbrains.java.decompiler.main.DecompilerContext;
-import org.jetbrains.java.decompiler.main.decompiler.BaseDecompiler;
-import org.jetbrains.java.decompiler.main.decompiler.PrintStreamLogger;
-import org.jetbrains.java.decompiler.main.extern.IBytecodeProvider;
-import org.jetbrains.java.decompiler.main.extern.IFernflowerLogger;
-import org.jetbrains.java.decompiler.main.extern.IFernflowerPreferences;
-import org.jetbrains.java.decompiler.main.extern.IResultSaver;
-import org.jetbrains.java.decompiler.main.extern.IVariableNameProvider;
-import org.jetbrains.java.decompiler.main.extern.IVariableNamingFactory;
-import org.jetbrains.java.decompiler.struct.StructMethod;
-import org.jetbrains.java.decompiler.util.InterpreterUtil;
-import org.jetbrains.java.decompiler.util.JADNameProvider;
 
 public class ApplyFernFlowerTask extends CachedTask {
     @InputFile
@@ -133,7 +123,7 @@ public class ApplyFernFlowerTask extends CachedTask {
 
         }
     }
-    class ByteCodeProvider implements IBytecodeProvider {
+    static class ByteCodeProvider implements IBytecodeProvider {
         @Override
         public byte[] getBytecode(String externalPath, String internalPath) throws IOException {
             File file = new File(externalPath);
@@ -235,7 +225,11 @@ public class ApplyFernFlowerTask extends CachedTask {
                     if (entry != null) {
                         InputStream in = srcArchive.getInputStream(entry);
                         ZipOutputStream out = mapArchiveStreams.get(file);
-                        out.putNextEntry(new ZipEntry(entryName));
+                        ZipEntry ze = new ZipEntry(entryName);
+                        ze.setLastAccessTime(FileTime.fromMillis(0L));
+                        ze.setLastModifiedTime(FileTime.fromMillis(0L));
+                        ze.setCreationTime(FileTime.fromMillis(0L));
+                        out.putNextEntry(ze);
                         InterpreterUtil.copyStream(in, out);
                         in.close();
                     }
@@ -258,7 +252,11 @@ public class ApplyFernFlowerTask extends CachedTask {
 
             try {
                 ZipOutputStream out = mapArchiveStreams.get(file);
-                out.putNextEntry(new ZipEntry(entryName));
+                ZipEntry ze = new ZipEntry(entryName);
+                ze.setLastAccessTime(FileTime.fromMillis(0L));
+                ze.setLastModifiedTime(FileTime.fromMillis(0L));
+                ze.setCreationTime(FileTime.fromMillis(0L));
+                out.putNextEntry(ze);
                 if (content != null) {
                     out.write(content.getBytes("UTF-8"));
                 }
