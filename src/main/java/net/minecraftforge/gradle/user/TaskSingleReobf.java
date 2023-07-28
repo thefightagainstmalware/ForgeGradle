@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import java.nio.file.attribute.FileTime;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.file.FileCollection;
@@ -254,12 +255,17 @@ public class TaskSingleReobf extends DefaultTask
         {
             if (e.isDirectory())
             {
+                e.setCreationTime(FileTime.fromMillis(0L));
+                e.setLastAccessTime(FileTime.fromMillis(0L));
+                e.setLastModifiedTime(FileTime.fromMillis(0L));
                 out.putNextEntry(e);
             }
             else
             {
                 ZipEntry n = new ZipEntry(e.getName());
-                n.setTime(e.getTime());
+                n.setCreationTime(FileTime.fromMillis(0L));
+                n.setLastAccessTime(FileTime.fromMillis(0L));
+                n.setLastModifiedTime(FileTime.fromMillis(0L));
                 out.putNextEntry(n);
 
                 byte[] data = ByteStreams.toByteArray(in.getInputStream(e));
