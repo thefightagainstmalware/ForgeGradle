@@ -6,6 +6,9 @@ buildscript {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+    	maven {
+            url "https://jitpack.io/"
+        }
     }
     dependencies {
         classpath "com.gradle.publish:plugin-publish-plugin:0.9.1"
