@@ -46,11 +46,8 @@ repositories {
         url = "https://repo.eclipse.org/content/groups/eclipse/"
     }
     mavenCentral()
-
-    // because SS and its snapshot
     maven {
-        name = "sonatype"
-        url = "https://oss.sonatype.org/content/repositories/snapshots/"
+    	url "https://jitpack.io/"
     }
 
 
