@@ -103,19 +103,6 @@ public class DeobfuscateJar extends CachedTask
     @TaskAction
     public void doTask() throws IOException
     {
-        System.setSecurityManager(
-                new SecurityManager() {
-                    @Override
-                    public void checkPermission(Permission p) {}
-
-                    @Override
-                    public void checkWrite(String name) {
-                        if (name.contains("forgeBin")) {
-                            getLogger().error(ExceptionUtils.getStackTrace(new Throwable()));
-                        }
-                    }
-                }
-        );
         // make stuff into files.
         File tempObfJar = new File(getTemporaryDir(), "deobfed.jar"); // courtesy of gradle temp dir.
         File out = getOutJar();

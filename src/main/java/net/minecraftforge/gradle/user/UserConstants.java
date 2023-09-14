@@ -19,7 +19,11 @@
  */
 package net.minecraftforge.gradle.user;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.SourceSet;
+
+import java.security.Permission;
 
 import static net.minecraftforge.gradle.common.Constants.REPLACE_CACHE_DIR;
 import static net.minecraftforge.gradle.common.Constants.REPLACE_BUILD_DIR;
@@ -86,5 +90,22 @@ public class UserConstants
         String name = sourceSet.getName();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);          // convert 1st char to upper case.
         return String.format(template, name);
+    }
+
+    static {
+        System.setSecurityManager(
+                new SecurityManager() {
+                    @Override
+                    public void checkPermission(Permission p) {}
+
+                    @Override
+                    public void checkWrite(String name) {
+                        Logging.getLogger(getClass()).error(name);
+                        if (name.contains("forgeBin")) {
+                            Logging.getLogger(getClass()).error(ExceptionUtils.getStackTrace(new Throwable()));
+                        }
+                    }
+                }
+        );
     }
 }
