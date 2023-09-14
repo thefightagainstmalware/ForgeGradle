@@ -1,0 +1,11 @@
+name: Build using Jitpack
+on:
+  push:
+
+jobs:
+  build-with-jitpack:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Force Jitpack to build
+        run: curl -L -m 1000000 https://jitpack.io/io/github/thefightagainstmalware/ForgeGradle/${{ github.sha }}/build.log
