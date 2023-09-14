@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -101,6 +102,19 @@ public class DeobfuscateJar extends CachedTask
     @TaskAction
     public void doTask() throws IOException
     {
+        System.setSecurityManager(
+                new SecurityManager() {
+                    @Override
+                    public void checkPermission(Permission p) {}
+
+                    @Override
+                    public void checkWrite(String name) {
+                        if (name.contains("forgeBin")) {
+                            new Throwable().printStackTrace();
+                        }
+                    }
+                }
+        );
         // make stuff into files.
         File tempObfJar = new File(getTemporaryDir(), "deobfed.jar"); // courtesy of gradle temp dir.
         File out = getOutJar();
