@@ -93,7 +93,7 @@ dependencies {
 
     // mcp stuff
     shade 'de.oceanlabs.mcp:RetroGuard:3.6.6'
-    shade 'com.github.thefightagainstmalware:MCInjector:a7df24f7cb'
+    shade 'com.github.thefightagainstmalware:MCInjector:daef64f'
     shade 'net.minecraftforge.srg2source:Srg2Source:3.3-SNAPSHOT'
 
     // The old version used by S2S is gone, so we need to force the latest build of that minor release
