@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.zip.ZipFile;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.*;
 
@@ -110,7 +111,7 @@ public class DeobfuscateJar extends CachedTask
                     @Override
                     public void checkWrite(String name) {
                         if (name.contains("forgeBin")) {
-                            new Throwable().printStackTrace();
+                            getLogger().error(ExceptionUtils.getStackTrace(new Throwable()));
                         }
                     }
                 }
